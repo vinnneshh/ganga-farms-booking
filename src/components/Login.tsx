@@ -21,7 +21,10 @@ export default function Login({ onLogin }: LoginProps) {
       const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ 
+          username: username.trim(), 
+          password: password.trim() 
+        }),
       });
 
       const data = await res.json();
@@ -60,6 +63,12 @@ export default function Login({ onLogin }: LoginProps) {
 
         <div className="premium-card p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="bg-neutral-50 p-3 rounded-lg border border-neutral-200 mb-4">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-1">Demo Credentials</p>
+              <p className="text-xs text-neutral-600">User: <span className="font-mono font-bold text-neutral-900">admin</span></p>
+              <p className="text-xs text-neutral-600">Pass: <span className="font-mono font-bold text-neutral-900">ganga@farms</span></p>
+            </div>
+
             <div className="space-y-2">
               <label className="text-xs font-bold uppercase tracking-wider text-neutral-500">
                 Username
@@ -72,6 +81,9 @@ export default function Login({ onLogin }: LoginProps) {
                   onChange={(e) => setUsername(e.target.value)}
                   className="input-field pl-10"
                   placeholder="Enter username"
+                  autoComplete="username"
+                  autoCapitalize="none"
+                  autoCorrect="off"
                   required
                 />
               </div>
@@ -89,6 +101,9 @@ export default function Login({ onLogin }: LoginProps) {
                   onChange={(e) => setPassword(e.target.value)}
                   className="input-field pl-10"
                   placeholder="Enter password"
+                  autoComplete="current-password"
+                  autoCapitalize="none"
+                  autoCorrect="off"
                   required
                 />
               </div>

@@ -106,13 +106,25 @@ export default function InvoiceGenerator({ booking, onBack, onEdit, onDelete, to
             colorProps.forEach(prop => {
               const value = computedStyle.getPropertyValue(prop);
               if (value && value.includes("oklch")) {
-                // Fallback to safe colors
+                // Map common neutral colors to HEX
+                let fallback = "#171717"; // Default to neutral-900
+                
+                if (htmlEl.classList.contains("text-neutral-400")) fallback = "#a3a3a3";
+                else if (htmlEl.classList.contains("text-neutral-500")) fallback = "#737373";
+                else if (htmlEl.classList.contains("text-neutral-600")) fallback = "#525252";
+                else if (htmlEl.classList.contains("text-neutral-700")) fallback = "#404040";
+                else if (htmlEl.classList.contains("text-neutral-300")) fallback = "#d4d4d4";
+                else if (htmlEl.classList.contains("bg-neutral-50")) fallback = "#fafafa";
+                else if (htmlEl.classList.contains("bg-neutral-900")) fallback = "#171717";
+                else if (htmlEl.classList.contains("border-neutral-100")) fallback = "#f5f5f5";
+                else if (htmlEl.classList.contains("border-neutral-200")) fallback = "#e5e5e5";
+
                 if (prop === "background-color") {
-                   htmlEl.style.setProperty(prop, "#ffffff", "important");
+                   htmlEl.style.setProperty(prop, fallback === "#171717" && !htmlEl.classList.contains("bg-neutral-900") ? "#ffffff" : fallback, "important");
                 } else if (prop === "color") {
-                   htmlEl.style.setProperty(prop, "#171717", "important");
+                   htmlEl.style.setProperty(prop, fallback, "important");
                 } else if (prop.includes("border") || prop.includes("color")) {
-                   htmlEl.style.setProperty(prop, "#e5e5e5", "important");
+                   htmlEl.style.setProperty(prop, fallback, "important");
                 } else if (prop === "box-shadow") {
                    htmlEl.style.setProperty(prop, "none", "important");
                 }
@@ -174,7 +186,7 @@ export default function InvoiceGenerator({ booking, onBack, onEdit, onDelete, to
           <ArrowLeft className="w-4 h-4" />
           Back to List
         </button>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap justify-center gap-3">
           {showDeleteConfirm ? (
             <div className="flex items-center gap-2 bg-red-50 p-1 rounded-lg border border-red-100">
               <span className="text-xs font-bold text-red-600 px-2">Confirm Delete?</span>
@@ -195,45 +207,48 @@ export default function InvoiceGenerator({ booking, onBack, onEdit, onDelete, to
           ) : (
             <button 
               onClick={() => setShowDeleteConfirm(true)} 
-              className="btn-secondary flex items-center gap-2 text-red-600 hover:bg-red-50 hover:border-red-200"
+              className="btn-secondary flex items-center gap-2 text-red-600 hover:bg-red-50 hover:border-red-200 px-4"
             >
               <Trash2 className="w-4 h-4" />
-              Delete
+              <span className="hidden sm:inline">Delete</span>
             </button>
           )}
           <button 
             onClick={onEdit} 
-            className="btn-secondary flex items-center gap-2"
+            className="btn-secondary flex items-center gap-2 px-4"
           >
             <ArrowLeft className="w-4 h-4" />
-            Edit Details
+            <span className="hidden sm:inline">Edit Details</span>
+            <span className="sm:hidden">Edit</span>
           </button>
-          <button onClick={handlePrint} className="btn-secondary flex items-center gap-2">
+          <button onClick={handlePrint} className="btn-secondary flex items-center gap-2 px-4">
             <Printer className="w-4 h-4" />
-            Print
+            <span className="hidden sm:inline">Print</span>
           </button>
           <button 
             onClick={handleDownloadPDF} 
             disabled={generating}
-            className="btn-primary flex items-center gap-2"
+            className="btn-primary flex items-center gap-2 px-4"
           >
             {generating ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
               <Download className="w-4 h-4" />
             )}
-            Download PDF
+            <span className="hidden sm:inline">Download PDF</span>
+            <span className="sm:hidden">PDF</span>
           </button>
         </div>
       </div>
 
-      {/* Invoice Preview */}
-      <div className="flex justify-center">
-        <div 
-          ref={invoiceRef}
-          className="bg-white w-[210mm] min-h-[297mm] p-[15mm] shadow-2xl border border-neutral-200 print:shadow-none print:border-none print:p-0 invoice-container"
-          style={{ fontFamily: "'Inter', sans-serif" }}
-        >
+      {/* Invoice Preview Container with scaling for mobile */}
+      <div className="flex justify-center overflow-x-auto pb-8">
+        <div className="origin-top scale-[0.4] sm:scale-[0.6] md:scale-[0.8] lg:scale-100 transition-transform duration-300">
+          <div 
+            ref={invoiceRef}
+            className="bg-white w-[210mm] min-h-[297mm] p-[15mm] shadow-2xl border border-neutral-200 print:shadow-none print:border-none print:p-0 invoice-container"
+            style={{ fontFamily: "'Inter', sans-serif" }}
+          >
           {/* Header */}
           <div className="text-center border-b-2 border-neutral-900 pb-6 mb-8">
             <h1 className="text-4xl font-serif font-bold tracking-tight text-neutral-900 mb-1">
@@ -429,6 +444,7 @@ export default function InvoiceGenerator({ booking, onBack, onEdit, onDelete, to
           </div>
         </div>
       </div>
+    </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
         /* Override oklch colors for html2canvas compatibility */

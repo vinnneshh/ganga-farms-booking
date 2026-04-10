@@ -41,14 +41,22 @@ export default function App() {
     const verifyToken = async () => {
       if (auth.token) {
         try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000);
+          
           const res = await fetch("/api/bookings", {
             headers: { Authorization: `Bearer ${auth.token}` },
+            signal: controller.signal
           });
+          
+          clearTimeout(timeoutId);
+          
           if (res.status === 401) {
             handleLogout();
           }
         } catch (e) {
           console.error("Token verification failed", e);
+          // Don't logout on network error, only on 401
         }
       }
     };

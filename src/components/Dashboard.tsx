@@ -116,7 +116,7 @@ export default function Dashboard({ onLogout, token }: DashboardProps) {
       {/* Main Content */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Tab Navigation */}
-        <div className="flex flex-wrap gap-2 mb-8">
+        <div className="flex overflow-x-auto no-scrollbar gap-2 mb-8 pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -129,7 +129,7 @@ export default function Dashboard({ onLogout, token }: DashboardProps) {
                 }
               }}
               className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all",
+                "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap",
                 activeTab === tab.id
                   ? "bg-neutral-900 text-white shadow-md"
                   : "bg-white text-neutral-600 border border-neutral-200 hover:border-neutral-300"

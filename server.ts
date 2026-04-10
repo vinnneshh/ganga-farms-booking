@@ -117,16 +117,24 @@ async function startServer() {
 
   // Login
   app.post("/api/login", (req, res) => {
-    const { username, password } = req.body;
-    if (username === "admin" && password === "admin123") {
+    const username = (req.body.username || "").trim();
+    const password = (req.body.password || "").trim();
+    
+    console.log(`Login attempt for user: ${username}`);
+    
+    if (username === "admin" && password === "ganga@farms") {
       const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
       const sessions = readSessions();
       sessions.push(token);
-      writeSessions(sessions);
-      console.log("User logged in. Token generated.");
-      res.json({ token });
+      if (writeSessions(sessions)) {
+        console.log(`Login successful for ${username}. Token generated and saved.`);
+        res.json({ token });
+      } else {
+        console.error("Failed to save session token to disk.");
+        res.status(500).json({ error: "Internal server error" });
+      }
     } else {
-      console.warn("Login failed: Invalid credentials");
+      console.warn(`Login failed for ${username}: Invalid credentials`);
       res.status(401).json({ error: "Invalid credentials" });
     }
   });
